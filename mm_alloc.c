@@ -6,50 +6,35 @@
  */
 
 #include "mm_alloc.h"
-#define align4(x) ((((x) - 1) >> 2) << 2) + 4
 #include <stdlib.h>
+#include<stdio.h>
+//#include <unistd.h>
+#define a(x) ((((x) - 1) >> 2) << 2) + 4
+
+
 
 /* Your final implementation should comment out this macro. */
 #define MM_USE_STUBS
-#define BLOCK_SIZE 20
+
+
 
 void *base = NULL;
 
-s_block_ptr extend_heap(s_block_ptr last, size_t size);
-s_block_ptr find_block(s_block_ptr last, size_t size);
-s_block_ptr get_block(void *p);
-void split_block(s_block_ptr b, size_t size);
-void copy_block(s_block_ptr src, s_block_ptr dst);
 
 
-void copy_block(s_block_ptr src, s_block_ptr dst){
-	int *sdata, *ddata;
-	size_t i;
-	sdata = src->ptr;
-	ddata = dst->ptr;
-	for(i = 0; i * 4 < src->size && i * 4 < dst->size; i++)
-	ddata[i] = sdata[i];
-}
-
-
-s_block_ptr find_block(s_block_ptr last, size_t size){
-	s_block_ptr b = base;
-	while (b && !(b->free && b->size >= size)){
-	last = b;
-	b = b->next;
-	}
-	return b;
-}
 void* mm_malloc(size_t size)
 {
 	 s_block_ptr b, last;
 	size_t s;
-	s = align4(size);
+	s = a(size);
 	if(base){
 	last = base;
-	b = find_block(last, s);
+	while (b && !(b->free && b->size >= s)){
+	last = b;
+	b = b->next;
+	}
 	if(b){
-	if((b->size - s) >= (BLOCK_SIZE + 4)) split_block(b, s);
+	if((b->size - s) >= (24)) split_block(b, s);
 	b->free = 0;
 	}
 	else{
@@ -72,21 +57,26 @@ void* mm_realloc(void* ptr, size_t size)
 	void *newp;
 	if(!ptr) return (malloc(size));
 	if (valid_addr(ptr)){
-	s = align4(size);
+	s = a(size);
 	b = get_block(ptr);
 	if (b->size >= s){
-	if(b->size - s >= (BLOCK_SIZE + 4)) split_block(b, s);
+	if(b->size - s >= (24)) split_block(b, s);
 	}
 	else{
-	if(b->next && b->next->free && (b->size + BLOCK_SIZE + b->next->size) >= s){
+	if(b->next && b->next->free && (b->size + 20 + b->next->size) >= s){
 	fusion(b);
-	if(b->size - s >= (BLOCK_SIZE + 4)) split_block(b, s);
+	if(b->size - s >= (24)) split_block(b, s);
 	}
 	else{
 	newp = malloc(s);
 	if (!newp) return NULL;
 	new = get_block(newp);
-	copy_block(b, new);
+	int *sdata, *ddata;
+	size_t i;
+	sdata = b->ptr;
+	ddata = new->ptr;
+	for(i = 0; i * 4 < b->size && i * 4 < new->size; i++)
+	ddata[i] = sdata[i];
 	free(ptr);
 	return newp;
 	}
@@ -95,6 +85,8 @@ void* mm_realloc(void* ptr, size_t size)
 	}
 	return NULL;
 }
+
+
 
 int valid_addr(void *p){
 	if (base){
@@ -105,6 +97,8 @@ int valid_addr(void *p){
 
 void mm_free(void* ptr)
 {
+
+
 
 	s_block_ptr b;
 	if (valid_addr(ptr)){

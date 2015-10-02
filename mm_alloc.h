@@ -74,8 +74,7 @@ return (p = tmp -= BLOCK_SIZE);
  */
 
 
-s_block_ptr first = {0,NULL,NULL,1,NULL};
-s_block_ptr last = {0,NULL,NULL,1,NULL};
+
 
 
 s_block_ptr extend_heap (s_block_ptr last , size_t s){
@@ -94,7 +93,7 @@ s_block_ptr extend_heap (s_block_ptr last , size_t s){
 
 }
 
-
+/*
 void set_block_content(s_block_ptr b,size_t s,struct s_block *next,struct s_block *prev, int free, void *ptr){
 	b->size = s;
 	b->next = next;
@@ -102,7 +101,7 @@ void set_block_content(s_block_ptr b,size_t s,struct s_block *next,struct s_bloc
 	b->free = free;
 	b->ptr = ptr;
 }
-
+*/
 
 #ifdef __cplusplus
 }
